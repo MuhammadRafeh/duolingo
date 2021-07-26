@@ -6,6 +6,8 @@ import Word from "./Word";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
 const words = [
   { id: 1, word: "Ihr" },
   { id: 8, word: "hungrig" },
@@ -27,15 +29,17 @@ const styles = StyleSheet.create({
 
 const Duolingo = () => {
   return (
-    <View style={styles.container}>
-      <Header />
-      <WordList>
-        {words.map((word) => (
-          <Word key={word.id} {...word} />
-        ))}
-      </WordList>
-      <Footer />
-    </View>
+    <SafeAreaProvider>
+      <View style={styles.container}>
+        <Header />
+        <WordList>
+          {words.map((word) => (
+            <Word key={word.id} {...word} />
+          ))}
+        </WordList>
+        <Footer />
+      </View>
+    </SafeAreaProvider>
   );
 };
 
