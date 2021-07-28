@@ -20,20 +20,38 @@ interface SortableWordProps {
   containerWidth: number;
 }
 
-const SortableWord = ({
-  offsets,
-  index,
-  children,
-  containerWidth,
-}: SortableWordProps) => {
+const SortableWord = ({ offsets, index, children, containerWidth }: SortableWordProps) => {
   const offset = offsets[index];
+  const isInPlaceholder = useDerivedValue(() => {
+    if (offset.order.value == -1) {
+      return true
+    } else {
+      return false;
+    }
+  })
+  const translateX = useDerivedValue(() => {
+    if (isInPlaceholder.value) {
+      return offset.originalX.value - MARGIN_LEFT ;
+    }
+    return offset.x.value;
+  })
+  const translateY = useDerivedValue(() => {
+    if (isInPlaceholder.value) {
+      return offset.originalY.value + MARGIN_TOP ;
+    }
+    return offset.y.value;
+  })
   const style = useAnimatedStyle(() => {
     return {
       position: "absolute",
       top: 0,
       left: 0,
-      right: 0,
-      bottom: 0,
+      width: offset.width.value,
+      height: offset.height.value,
+      transform: [
+        { translateX: translateX.value },
+        { translateY: translateY.value }
+      ]
     };
   });
   return (
