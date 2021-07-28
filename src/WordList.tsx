@@ -27,7 +27,7 @@ interface WordListProps {
 const WordList = ({ children }: WordListProps) => {
   const [ready, setReady] = useState(false);
   const offsets = children.map(() => ({
-    order: useSharedValue(0),
+    order: useSharedValue(0), //-1 if it has no order
     width: useSharedValue(0),
     height: useSharedValue(0),
     x: useSharedValue(0),
@@ -39,7 +39,25 @@ const WordList = ({ children }: WordListProps) => {
     return (
       <View style={styles.row}>
         {children.map((child, index) => {
-          return <View key={index}>{child}</View>;
+          return <View
+            key={index}
+            onLayout={({ nativeEvent: { layout: { width, height, x, y } } }) => {
+              const offset = offsets[index];
+              offset.order.value = -1;
+              offset.width.value = width;
+              offset.height.value = height;
+              offset.originalX.value = x;
+              offset.originalY.value = y;
+              console.log(x, y)
+              runOnUI(() => {
+                if (offsets.length == (index + 1)) {
+                  setReady(true);
+                }
+              })();
+            }}
+          >
+            {child}
+          </View>;
         })}
       </View>
     );
