@@ -63,7 +63,7 @@ const SortableWord = ({ offsets, index, children, containerWidth }: SortableWord
         // offset.order.value = calculateOrder(offsets)
         offset.order.value = calculateOrder(offsets)
         // console.log('aaaaaaaaaasdasd')
-        // calculateLayout(offsets, containerWidth);
+        calculateLayout(offsets, containerWidth);
       } else if (!isInPlaceholder.value && translation.y.value > 100){
         offset.order.value = -1;
         // calculateLayout(offsets, containerWidth);

@@ -1,3 +1,4 @@
+import { Offset } from './Layout';
 import { move } from "react-native-redash";
 import { SharedValues } from "../components/AnimatedHelpers";
 
@@ -11,9 +12,9 @@ export type Offset = SharedValues<{
   originalY: number;
 }>;
 
-const isNotInPlaceholder = (order: number) => {
+const isNotInPlaceholder = (offset: Offset) => {
   "worklet";
-  return order !== -1;
+  return offset.order.value !== -1;
 }
 
 const sortAscending = (a: Offset, b: Offset) => {
