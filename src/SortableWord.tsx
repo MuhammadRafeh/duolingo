@@ -30,16 +30,51 @@ const SortableWord = ({ offsets, index, children, containerWidth }: SortableWord
       return false;
     }
   })
+
+  const translation = useVector(offset.originalX.value - MARGIN_LEFT, offset.originalY.value + MARGIN_TOP);
+
+  const isGestureStart = useSharedValue(false);
+
+  const onGestureEvent = useAnimatedGestureHandler({
+    onStart: (_, ctx) => {
+      if (isInPlaceholder){
+        translation.x.value = offset.originalX.value  - MARGIN_LEFT;
+        translation.y.value = offset.originalY.value  + MARGIN_TOP;
+      } else {
+        // ctx.x = translation.x.value;
+        // ctx.y = translation.y.value;
+        translation.x.value = offset.x.value;
+        translation.y.value = offset.y.value;
+      }
+      ctx.x = translation.x.value;
+      ctx.y = translation.y.value;
+      isGestureStart.value = true
+    },
+    onActive: ({translationX, translationY}, ctx) => {
+      translation.x.value = ctx.x + translationX;
+      translation.y.value = ctx.y + translationY;
+    },
+    onEnd: () => {
+      isGestureStart.value = false;
+    }
+  })
+  
   // console.log('{}{}', isInPlaceholder.value)
   const translateX = useDerivedValue(() => {
+    if (isGestureStart.value) {
+      return translation.x.value;
+    }
     if (isInPlaceholder.value) {
-      return offset.originalX.value - MARGIN_LEFT ;
+      return offset.originalX.value - MARGIN_LEFT;
     }
     return offset.x.value;
   })
   const translateY = useDerivedValue(() => {
+    if (isGestureStart.value) {
+    return translation.y.value; 
+    }
     if (isInPlaceholder.value) {
-      return offset.originalY.value + MARGIN_TOP ;
+      return offset.originalY.value + MARGIN_TOP;
     }
     return offset.y.value;
   })
@@ -48,6 +83,7 @@ const SortableWord = ({ offsets, index, children, containerWidth }: SortableWord
       position: "absolute",
       top: 0,
       left: 0,
+      zIndex: isGestureStart ? 100: 0,
       width: offset.width.value,
       height: offset.height.value,
       transform: [
@@ -60,9 +96,11 @@ const SortableWord = ({ offsets, index, children, containerWidth }: SortableWord
     <>
       <Placeholder offset={offset} />
       <Animated.View style={style}>
-        <Animated.View style={StyleSheet.absoluteFill}>
-          {children}
-        </Animated.View>
+        <PanGestureHandler onGestureEvent={onGestureEvent}>
+          <Animated.View style={StyleSheet.absoluteFill}>
+            {children}
+          </Animated.View>
+        </PanGestureHandler>
       </Animated.View>
     </>
   );
