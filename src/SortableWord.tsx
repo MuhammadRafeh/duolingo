@@ -11,7 +11,7 @@ import Animated, {
 import { PanGestureHandler } from "react-native-gesture-handler";
 import { between, useVector } from "react-native-redash";
 
-import { calculateLayout, calculateOrder, lastOrder, Offset, remove, reorder } from "./Layout";
+import { calculateLayout, calculateOrder, Offset, remove, reOrder } from "./Layout";
 import Placeholder, { MARGIN_TOP, MARGIN_LEFT } from "./components/Placeholder";
 
 interface SortableWordProps {
@@ -24,9 +24,9 @@ interface SortableWordProps {
 const SortableWord = ({ offsets, index, children, containerWidth }: SortableWordProps) => {
   const offset = offsets[index];
   // offsets.forEach((element) => console.log(element.order.value))
-  
+
   const isInPlaceholder = useDerivedValue(() => {
-    console.log('asdasd',offset.order.value)
+    console.log('asdasd', offset.order.value)
     if (offset.order.value == -1) {
       return true
     } else {
@@ -42,10 +42,10 @@ const SortableWord = ({ offsets, index, children, containerWidth }: SortableWord
 
   const onGestureEvent = useAnimatedGestureHandler({
     onStart: (_, ctx) => {
-      if (isInPlaceholder.value){
+      if (isInPlaceholder.value) {
         // console.log('true trues', isInPlaceholder)
-        translation.x.value = offset.originalX.value  - MARGIN_LEFT;
-        translation.y.value = offset.originalY.value  + MARGIN_TOP;
+        translation.x.value = offset.originalX.value - MARGIN_LEFT;
+        translation.y.value = offset.originalY.value + MARGIN_TOP;
       } else {
         // ctx.x = translation.x.value;
         // ctx.y = translation.y.value;
@@ -56,20 +56,37 @@ const SortableWord = ({ offsets, index, children, containerWidth }: SortableWord
       ctx.y = translation.y.value;
       isGestureStart.value = true
     },
-    onActive: ({translationX, translationY}, ctx) => {
+    onActive: ({ translationX, translationY }, ctx) => {
       translation.x.value = ctx.x + translationX;
       translation.y.value = ctx.y + translationY;
-      if (isInPlaceholder.value && translation.y.value < 100){// here it is on line
+      if (isInPlaceholder.value && translation.y.value < 100) {// here it is on line
         // offset.order.value = calculateOrder(offsets)
         offset.order.value = calculateOrder(offsets)
         // console.log('aaaaaaaaaasdasd')
         calculateLayout(offsets, containerWidth);
-      } else if (!isInPlaceholder.value && translation.y.value > 100){
+      } else if (!isInPlaceholder.value && translation.y.value > 100) {
         offset.order.value = -1;
         remove(offsets, index);
         calculateLayout(offsets, containerWidth);
         // console.log('aaaaaaaaa')
       }
+
+      for (let i = 0; i < offsets.length; i++) { //here we are comparing distance between current 
+        const o = offsets[i]!;
+        if (i === index && o.order.value !== -1) {
+          continue;
+        }
+        if (
+          between(translation.x.value, o.x.value, o.x.value + o.width.value) &&
+          between(translation.y.value, o.y.value-10, o.y.value+10)
+        ) {
+          reOrder(offsets, offset.order.value, o.order.value);
+          calculateLayout(offsets, containerWidth);
+          break;
+        }
+      }
+
+
     },
     onEnd: () => {
       isGestureStart.value = false;
@@ -77,26 +94,26 @@ const SortableWord = ({ offsets, index, children, containerWidth }: SortableWord
       translation.y.value = withSpring(offset.y.value)
     }
   })
-  
+
   // console.log('{}{}', isInPlaceholder.value)
   const translateX = useDerivedValue(() => {
     if (isGestureStart.value) {
       return translation.x.value;
     }
-    return withSpring(isInPlaceholder.value ? offset.originalX.value - MARGIN_LEFT: offset.x.value)
+    return withSpring(isInPlaceholder.value ? offset.originalX.value - MARGIN_LEFT : offset.x.value)
   })
   const translateY = useDerivedValue(() => {
     if (isGestureStart.value) {
-    return translation.y.value; 
+      return translation.y.value;
     }
-    return withSpring(isInPlaceholder.value ? offset.originalY.value + MARGIN_TOP: offset.y.value)
+    return withSpring(isInPlaceholder.value ? offset.originalY.value + MARGIN_TOP : offset.y.value)
   })
   const style = useAnimatedStyle(() => {
     return {
       position: "absolute",
       top: 0,
       left: 0,
-      zIndex: isGestureStart.value ? 100: 0,
+      zIndex: isGestureStart.value ? 100 : 0,
       width: offset.width.value,
       height: offset.height.value,
       transform: [

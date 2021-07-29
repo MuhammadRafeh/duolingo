@@ -26,7 +26,7 @@ export const reOrder = (inputOffsets: Offset[], from: number, to: number) => {
   "worklet";
 
   const offsets = inputOffsets.filter(isNotInPlaceholder).sort(sortAscending);
-  const newOffset = move(inputOffsets, from, to);
+  const newOffset = move(offsets, from, to);
   newOffset.map((offset, index) => (offset.order.value = index));
 }
 
