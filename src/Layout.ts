@@ -29,6 +29,11 @@ export const reOrder = (inputOffsets: Offset[], from: number, to: number) => {
   newOffset.map((offset, index) => (offset.order.value = index));
 }
 
+export const calculateOrder = (inputOffsets: Offset[]) => {
+  "worklet";
+  return inputOffsets.filter(isNotInPlaceholder).length; //we are not adding 1 because index starts with 0
+}
+
 export const calculateLayout = (inputOffsets: Offset[], containerWidth: number) => {
   "worklet";
 
