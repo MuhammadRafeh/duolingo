@@ -1,3 +1,4 @@
+import { move } from "react-native-redash";
 import { SharedValues } from "../components/AnimatedHelpers";
 
 export type Offset = SharedValues<{
@@ -18,6 +19,14 @@ const isNotInPlaceholder = (order: number) => {
 const sortAscending = (a: Offset, b: Offset) => {
   "worklet";
   return a.order.value > b.order.value ? 1: -1;
+}
+
+export const reOrder = (inputOffsets: Offset[], from: number, to: number) => {
+  "worklet";
+
+  const offsets = inputOffsets.filter(isNotInPlaceholder).sort(sortAscending);
+  const newOffset = move(inputOffsets, from, to);
+  newOffset.map((offset, index) => (offset.order.value = index));
 }
 
 export const calculateLayout = (inputOffsets: Offset[], containerWidth: number) => {
