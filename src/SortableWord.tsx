@@ -22,6 +22,7 @@ interface SortableWordProps {
 
 const SortableWord = ({ offsets, index, children, containerWidth }: SortableWordProps) => {
   const offset = offsets[index];
+  // offsets.forEach((element) => console.log(element.order.value))
   const isInPlaceholder = useDerivedValue(() => {
     if (offset.order.value == -1) {
       return true
@@ -29,6 +30,7 @@ const SortableWord = ({ offsets, index, children, containerWidth }: SortableWord
       return false;
     }
   })
+  // console.log('{}{}', isInPlaceholder.value)
   const translateX = useDerivedValue(() => {
     if (isInPlaceholder.value) {
       return offset.originalX.value - MARGIN_LEFT ;
