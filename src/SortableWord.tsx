@@ -11,7 +11,7 @@ import Animated, {
 import { PanGestureHandler } from "react-native-gesture-handler";
 import { between, useVector } from "react-native-redash";
 
-import { calculateLayout, calculateOrder, lastOrder, Offset, reorder } from "./Layout";
+import { calculateLayout, calculateOrder, lastOrder, Offset, remove, reorder } from "./Layout";
 import Placeholder, { MARGIN_TOP, MARGIN_LEFT } from "./components/Placeholder";
 
 interface SortableWordProps {
@@ -66,8 +66,9 @@ const SortableWord = ({ offsets, index, children, containerWidth }: SortableWord
         calculateLayout(offsets, containerWidth);
       } else if (!isInPlaceholder.value && translation.y.value > 100){
         offset.order.value = -1;
-        // calculateLayout(offsets, containerWidth);
-        console.log('aaaaaaaaa')
+        remove(offsets, index);
+        calculateLayout(offsets, containerWidth);
+        // console.log('aaaaaaaaa')
       }
     },
     onEnd: () => {

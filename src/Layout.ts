@@ -30,6 +30,15 @@ export const reOrder = (inputOffsets: Offset[], from: number, to: number) => {
   newOffset.map((offset, index) => (offset.order.value = index));
 }
 
+export const remove = (input: Offset[], index: number) => {
+  "worklet";
+  const offsets = input
+    .filter((_, i) => i !== index)
+    .filter(isNotInPlaceholder)
+    .sort(sortAscending);
+  offsets.map((offset, i) => (offset.order.value = i));
+};
+
 export const calculateOrder = (inputOffsets: Offset[]) => {
   "worklet";
   return inputOffsets.filter(isNotInPlaceholder).length; //we are not adding 1 because index starts with 0
